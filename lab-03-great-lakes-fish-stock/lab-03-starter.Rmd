@@ -1,7 +1,7 @@
 ---
 title: "Lab 03 - Great Lakes Fish Stocking"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Daytonna Anderson"
+date: "October 8, 2025"
 output: html_document
 ---
 
@@ -19,39 +19,98 @@ fish_stock <- read_csv("../data/great-lakes-fish-stock.csv")
 
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here.
+```{r glimpse-data, eval = FALSE}
+glimpse(fish_stock)
+```
+There are 56,232 observations and 8 variables. Each row represents an observation based on fish stock in each lake region.
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 2 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r salmon-stock, eval = TRUE}
+salmon_stock <- fish_stock %>%
+  filter(
+    SPECIES %in% c("ATS", "CHS", "COS"),
+    !is.na(WEIGHT),
+     LAKE != "ON"
+  )
+```
+
+```{r salmon-output, eval = TRUE}
+nrow(salmon_stock)
+ncol(salmon_stock)
+str(salmon_stock)
+```
+
+There are 5131 observations and 8 variables (before the mutation). The numerical variables are YEAR, MONTH, NO_STOCKED, AGEMONTH, and WEIGHT. The character string variables are LAKE, STATE_PROV, and SPECIES. 
 
 ### Exercise 3
 
-Remove this text, and add your answer for Exercise 3 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r mutate-salmon}
+salmon_stock <- salmon_stock %>%
+  mutate(
+    AV_WEIGHT = WEIGHT / NO_STOCKED * 1000
+  )
+```
+
+The mutate() function is using a variable we already have and modifying it through a calculation to create a new variable. 
 
 ### Exercise 4
 
-Remove this text, and add your answer for Exercise 4 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r summarize-salmon}
+salmon_stock %>% 
+  filter(YEAR > 2000) %>% 
+  group_by(YEAR, LAKE) %>% 
+  summarize(MEAN_NO_STOCKED = mean(WEIGHT, na.rm = TRUE), 
+            MEAN_WEIGHT = mean(WEIGHT, na.rm = TRUE)) %>% 
+  arrange(desc(MEAN_NO_STOCKED))
+```
+The lakes with the largest average number of fish per stocking event are Michigan, Superior, and Huron. They also have the largest average fish weight per stocking event. 
 
 ### Exercise 5
 
-Remove this text, and add your answer for Exercise 5 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r trout-stock}
+trout_stock <- fish_stock %>%
+  filter(
+    SPECIES %in% c("BKT", "BRN", "LAT", "RBT", "TRT"),
+    !is.na(WEIGHT),
+     LAKE != "ON")
+```
+
+```{r mutate-trout}
+trout_stock <- salmon_stock %>%
+  mutate(
+    AV_WEIGHT = WEIGHT / NO_STOCKED * 1000
+  )
+```
+
+```{r summarize-trout}
+salmon_stock %>% 
+  filter(YEAR > 2000) %>% 
+  group_by(YEAR, LAKE) %>% 
+  summarize(MEAN_NO_STOCKED = mean(WEIGHT, na.rm = TRUE), 
+            MEAN_WEIGHT = mean(WEIGHT, na.rm = TRUE)) %>% 
+  arrange(desc(MEAN_NO_STOCKED))
+```
 
 ### Exercise 6
 
-Remove this text, and add your answer for Exercise 6 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+```{r fish-wrangle}
+fish_stock %>% 
+  filter(SPECIES %in% c("BKT", "CHS")) %>% 
+  group_by(YEAR, LAKE, SPECIES) %>% 
+  summarize(ANNUAL_STOCKED = sum(NO_STOCKED, na.rm = TRUE)) %>%
+ggplot(aes(x = YEAR, y = ANNUAL_STOCKED, color = SPECIES)) + 
+  geom_line() +
+  facet_wrap(~ LAKE) +
+  labs(
+    title = "Annual Total of Chinook Salmon and Brook Stocked",
+    x = "Year",
+    y = "Annual Total Stocked",
+    color = "Fish Species")
+
+```
+
+
+The Chinook Salmon was stocked at a higher rate on average. 
+Overall, Lake Michigan had the largest fish stocking activities. Fish stocking reached its peak in Lake Michigan in 1990.
+
