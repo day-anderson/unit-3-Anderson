@@ -1,7 +1,7 @@
 ---
 title: "HW 03 - Great Lakes Fish Datasets"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Daytonna Anderson"
+date: "October 8, 2025"
 output: html_document
 ---
 
@@ -21,36 +21,66 @@ fish_stock <- read_csv("data/great-lakes-fish-stock.csv")
 
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here.
+```{r catch-data-subset}
+catch_data <- catch_data %>%
+  select(year, lake, species, region, values)
+```
+
+```{r fish-stock-subset}
+fish_stock <- fish_stock %>%
+  select(YEAR, MONTH, LAKE, STATE_PROV, SPECIES, WEIGHT)
+```
 
 ### Exercise 2
 
-Remove this text, and add your answer for Exercise 2 here.
+```{r new-glimpse}
+
+glimpse(fish_stock)
+
+glimpse(catch_data)
+```
 
 ### Exercise 3
 
-Remove this text, and add your answer for Exercise 3 here.
+```{r simple-fish}
+fish_stock <- fish_stock %>% 
+  filter(STATE_PROV %in% c("MI", "WI", "IL", "IN"),
+         SPECIES == "CHS",
+         LAKE == "MI")
+```
+
+```{r simple-catch}
+catch_data <- catch_data %>% 
+  filter(region == "U.S. Total",
+         species == "Chinook Salmon",
+         lake == "Michigan")
+```
 
 ### Exercise 4
 
-Remove this text, and add your answer for Exercise 4 here.
+```{r data-frame}
+nrow(fish_stock)
+nrow(catch_data)
+
+min(fish_stock$YEAR)
+max (fish_stock$YEAR)
+
+min(catch_data$year)
+max(catch_data$year)
+```
+
+There are less observations within the specific data frame that we set for one data set over the other.
 
 ### Exercise 5
 
-Remove this text, and add your answer for Exercise 5 here.
-
-### Code chunks provided
-
-Remember to change eval = FALSE, to eval = TRUE, when you are ready to run the code/knit the document.
-
-```{r finalize-fish-stock, eval = FALSE}
+```{r finalize-fish-stock, eval = TRUE}
 fish_stock_yearly <- fish_stock_yearly %>% 
   rename(year = YEAR) %>% 
-  mutate(stock_weight_yr_lbs = as.integer(STOCK_WEIGHT_YR * 0.454 / 1000)) %>% # 1 lb = 1 kg * 0.454
+  mutate(stock_weight_yr_lbs = as.integer(STOCK_WEIGHT_YR * 0.454 / 1000)) %>% 
   select(year, stock_weight_yr_lbs)
 ```
 
-```{r finalize-catch-data, eval = FALSE}
+```{r finalize-catch-data, eval = TRUE}
 catch_data <- catch_data %>% 
   rename(catch_weight_yr_lbs = values)
 ```
