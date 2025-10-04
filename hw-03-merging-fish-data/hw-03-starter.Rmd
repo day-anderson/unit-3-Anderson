@@ -73,6 +73,15 @@ There are less observations within the specific data frame that we set for one d
 
 ### Exercise 5
 
+```{r}
+fish_stock_yearly <- fish_stock %>% 
+  group_by(YEAR) %>% 
+  summarize(STOCK_WEIGHT_YR = sum(WEIGHT, na.rm = T))
+```
+
+
+### Code chunks provided
+
 ```{r finalize-fish-stock, eval = TRUE}
 fish_stock_yearly <- fish_stock_yearly %>% 
   rename(year = YEAR) %>% 
@@ -82,17 +91,69 @@ fish_stock_yearly <- fish_stock_yearly %>%
 
 ```{r finalize-catch-data, eval = TRUE}
 catch_data <- catch_data %>% 
-  rename(catch_weight_yr_lbs = values)
+  rename(values = catch_weight_yr_lbs)
 ```
 
 ### Exercise 6
 
-Remove this text, and add your answer for Exercise 6 here.
+```{r inner-catch}
+catch_data %>% 
+  inner_join(fish_stock_yearly)
+```
+It combined the two datasets based on similar values, which are year, weight, lake, species, region, and values.
+
+```{r inner-fish}
+fish_stock_yearly %>% 
+  inner_join(catch_data)
+```
+It combined the two datasets based on similar values, which are year, weight, lake, species, region, and values. 
+
+```{r full-catch}
+catch_data %>% 
+  full_join(fish_stock_yearly)
+```
+This function combines both tables with all variables. When one data set doesn't contain that variable, NA is used for that observation.
+
+```{r full-fish}
+fish_stock_yearly %>% 
+  full_join(catch_data)
+```
+This function combines both tables with all variables. When one data set doesn't contain that variable, NA is used for that observation.
+
+```{r anti-catch}
+catch_data %>% 
+  anti_join(fish_stock_yearly)
+```
+It keeps the rows that have mismatched data sets to show missing data between the two tables. In this case, there isn't any so no observations are shown. 
+
+
+```{r anti-fish }
+fish_stock_yearly %>% 
+  anti_join(catch_data)
+```
+It keeps the rows that have mismatched data sets to show missing data between the two tables. In this case it's year and weight. 
 
 ### Exercise 7
 
-Remove this text, and add your answer for Exercise 7 here.
+```{r left-catch}
+catch_data %>% 
+  left_join(fish_stock_yearly) %>% 
+  pivot_longer(names_to = "activity",
+               values_to = "weight",
+               cols = 5:6)
+```
+
 
 ### Exercise 8
 
-Remove this text, and add your answer for Exercise 8 here.
+```{r join-visualization}
+catch_data %>% 
+  left_join(fish_stock_yearly) %>% 
+  pivot_longer(names_to = "activity",
+               values_to = "weight",
+               cols = 5:6) %>%
+ggplot(aes(x = year, y = weight, color = activity)) +
+  geom_line() +
+  theme_bw()
+```
+The trends spiked in 1995 and then have since decreased, gradually.
